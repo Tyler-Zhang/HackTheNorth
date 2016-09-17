@@ -104,11 +104,31 @@ app.post('/update', (req, res) => {
 
 addPostListener("getdata", (res, data) => {
     usersdb.findOne({auth: data.auth}, {_id: 0, pass: 0, auth: 0})
-    .then(d => {
-        console.log(d);
-        resp(res, SUC, d)},
+    .then(d => {resp(res, SUC, d)},
           e => {resp(res, ERR, e.message)});
 });
+
+app.get("/img/:auth/:imageid", (req, res) => {
+    var auth = req.params.auth;
+    var imageid = req.params.imageid;
+    console.log(auth);
+    console.log(imageid);
+    usersdb.aggregate([
+        {$match: {auth: auth}},
+        {$unwind: "$clothing"},
+        {$match: {"clothing.p": imageid}}
+    ], (e,r) => {
+        if(e)
+            return resp(res, ERR, e.message);
+        if(r.length == 0)
+            return resp(res, ERR, "You do not have access to this image");
+
+        res.sendFile(path.join(__dirname, 'img', imageid));
+    })
+});
+
+
+
 function addPostListener(URL, callBack)
 {
     app.post("/" + URL, (req, res) => {
