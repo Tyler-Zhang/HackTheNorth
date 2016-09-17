@@ -37,7 +37,7 @@ app.all('*', function(req, res, next) {
 });
 
 app.use(busboy());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "Public")));
 
 addPostListener("createacc", (res, data) => {
     if(!checkData(res, data, ["username", "password"]))
