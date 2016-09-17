@@ -72,10 +72,10 @@ addPostListener("auth", (res, data) => {
         if(d.pass != data.password)
             throw new Error("Password mismatch");
         resp(res, SUC, {auth: d.auth});
-    }, e => {
+    })
+    .catch( e => {
         resp(res, ERR, {message: e.message});
     });
-    
 });
 
 app.post('/update', (req, res) => {

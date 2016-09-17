@@ -7,5 +7,3 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
-
-alert("Hey");

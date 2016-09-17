@@ -1,23 +1,27 @@
-chrome.browserAction.onClicked.addListener(function(tab) {
-  // Send a message to the active tab
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    var activeTab = tabs[0];
-    chrome.tabs.sendMessage(activeTab.id, {"message": "clicked_browser_action"});
-    console.log("hey");
-  });
+// Check if there's a pre-existing auth token
+var token;
+//chrome.storage.sync.set({dressrToken: null}, () => {});
+
+chrome.storage.sync.get("dressrToken", value =>{
+    console.log(value.dressrToken);
+    if(value.dressrToken != null)
+        chrome.browserAction.setPopup({popup: "popup.html"})
 });
 
-function test()
-{
-    chrome.storage.sync.set({ "dressrToken": "1221i391jio12kmld" }, function(){
-        console.log("Saved successfully");
-    });
-
-    chrome.storage.sync.get("dressrToken", function(items){
-        console.log(items);
-    });
-
-}
+chrome.extension.onConnect.addListener(function(port) {
+  port.onMessage.addListener(function(msg) {
+      console.log(msg);
+        if(msg.auth)
+        {
+            token = msg.auth;
+            chrome.storage.sync.set({dressrToken: token}, (e) => {
+                console.log(e);
+            });
+            port.postMessage("popup.html");
+            chrome.browserAction.setPopup({popup: "popup.html"})
+        }
+  });
+});
 
 function postRequest(url, data, callback){
 	var request = new XMLHttpRequest();
