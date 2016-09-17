@@ -3,3 +3,4 @@ jsonAuth.json
 **/*.log
 .idea
 /server/data
+/server/img
