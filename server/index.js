@@ -28,9 +28,16 @@ mongo.connect("mongodb://localhost:27017/Dessr", (err, d) => {
         usersdb  = d.collection("users");
     }
 });
+
+app.all('*', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
+
 app.use(busboy());
 app.use(express.static(__dirname));
-//app.use(multer({ dest: './uploads/'}));
 
 addPostListener("createacc", (res, data) => {
     if(!checkData(res, data, ["username", "password"]))
@@ -91,9 +98,26 @@ app.post('/update', (req, res) => {
             if(!checkData(res, obj, ["tags", "auth"]))
                 return;
             obj.tags = obj.tags.trim().split(" ");
-            usersdb.updateOne({auth: obj.auth}, {$push: {clothing: {p: imageId, tags: obj.tags}}}, {upsert:true})
-            .then(() => {resp(res, SUC, "Updated")},
-                   e => {resp(res, ERR, e.message)});
+            usersdb.findOne({auth: obj.auth})
+            .then(d => {
+                if(d == null)
+                    throw new Error("Account not found");
+                return d._id;
+            })
+            .then(d => {
+                return usersdb.updateOne({_id: d},  {$push: {clothing: {p: imageId, tags: obj.tags}}});
+            })
+            .then(d => {
+                resp(res, SUC, "Updated");
+            })
+            .catch(e => {
+                resp(res, ERR, e.message);
+                fs.unlink(path.join(__dirname, "img", imageId), e => {
+                    if(e) 
+                        return console.log(err);
+                    console.log('file deleted successfully');
+                });  
+            })
         });
     } catch(e)
     {
@@ -107,6 +131,12 @@ addPostListener("getdata", (res, data) => {
     .then(d => {resp(res, SUC, d)},
           e => {resp(res, ERR, e.message)});
 });
+
+app.get("/getdata/:auth", (req,res) => {
+    usersdb.findOne({auth: req.params.auth}, {_id: 0, pass: 0, auth: 0})
+    .then(d => {resp(res, SUC, d)},
+          e => {resp(res, ERR, e.message)});
+})
 
 app.get("/img/:auth/:imageid", (req, res) => {
     var auth = req.params.auth;
