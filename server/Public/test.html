@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>ScreenOff</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/grayscale.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+</head>
+
+<body class="container-fluid">
+
+    <div class="row">
+        <h1 class="text-center" style="margin-top:30px;"> Server Post Request Tester </h1>
+    </div>
+    <div class="row">
+        <div class="form-horizontal col-md-5 col-md-offset-1">
+            <div class="form-group" style="margin-bottom:30px; margin-top:40px">     
+                <label for="url-selector" style="margin-left:14px;">Post URL</label>
+                <div>
+                    <div class="col-md-6">
+                        <select class="form-control" id="url-selector" onchange="change(this.value)">
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 id="url-desc" class="text-center" style="color:white">For creating a new room</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="attrDefault" style="margin-left:14px;">Default Fields</label>
+                <div>
+                    <div class="col-md-6" style="margin-bottom:40px;">
+                        <select class="form-control" id="attrDefault" multiple></select>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <h5 id="attr-desc" class="text-center" style="color:white"></h5>
+                        </div>
+                        <div class="row">
+                            <h6 class="text-center" style="color:white" id="attr-opt"></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label for="attrName">Object Attribute Name</label>
+                    <input type="text" class="form-control" id="attrName" placeholder="Attribute Name"/>
+                </div>
+                <div class="col-md-6">
+                    <label for="attrName">Object Value</label>
+                    <input type="text" class="form-control" id="attrValue" placeholder="Value"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" style="margin-left:13px; margin-bottom:10px" onclick="addToObj()"> Add to Obj </button>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-6">
+                    <label for="json-txt"> Request JSON </label>
+                    <textarea class="form-control" rows="5" id="json-txt" placeholder="JSON Object" readonly>{}</textarea>
+                </div>
+                <div class="col-xs-6">
+                    <label for="res-txt">Response JSON </label>
+                    <textarea class="form-control" rows="5" id="res-txt" placeholder="JSON Object" readonly></textarea>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <div style="margin-left: 13px;">
+                    </div>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-success" style="margin-left:13px;" onClick="post()"> Make Post Request </button>
+                <button class="btn btn-danger" style="margin-left:13px;" onClick="clrObj()"> Clear </button>
+            </div>
+        </div>
+        <div class="row col-md-5 " style="margin-top:67px;">
+            <div style="margin-left:13px">
+                <table class="table table-bordered table-hover" style="color:black; background-color:white" id="json-table">
+                    <tr class="header">
+                        <th class="text-center"> Attribute Name </th>
+                        <th class="text-center"> Attribute Value </th>
+                        <th class="text-center"> Remove </th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/main.js"></script>
+    <script src="js/postReqDef.js"></script>
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+    
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="js/jquery.easing.min.js"></script>
+
+    <script type = "text/javascript">
+        var obj = {};
+        
+        window.onload = () => {
+            var urlSelector = document.getElementById("url-selector");
+            for(var x = 0; x < Object.keys(urlDefinition).length; x++)
+            {
+                var urlData = document.createElement("option");
+                urlData.innerHTML = Object.keys(urlDefinition)[x];
+                urlSelector.appendChild(urlData);
+            }
+            change(getVal("url-selector"));
+
+        }
+
+        function change(url)
+        {
+            setInner("attr-desc", "");
+            setInner("attr-opt", "");
+            var def = urlDefinition[url];
+            setInner("url-desc", def.desc);
+
+            var attrDef = document.getElementById("attrDefault");
+            for(var x = 0; x < attrDef.children.length; x++)
+                attrDef.removeChild(attrDef.children[x--]);
+            
+            if(!def.attr.names)
+                return;
+                
+            for(var x = 0; x < def.attr.names.length; x++)
+            {
+                var attrData = document.createElement("option");
+                attrData.innerHTML = def.attr.names[x];
+                attrData.setAttribute("onClick", "changeAttrDef(this.value)");
+                attrData.setAttribute("ondblClick", "setVal('attrName', this.value)");
+                if(def.attr.req[x])
+                    attrData.className = "bg-success";
+                attrDef.appendChild(attrData);
+            }  
+        }
+        
+        function changeAttrDef(attr)
+        {
+            setInner("attr-desc", attrDefinition[attr].desc);
+            setInner("attr-opt", "<mark> " + attrDefinition[attr].opt + "</mark>");
+        }
+
+        function post()
+        {
+            postRequest(getVal("url-selector"), obj, (res) => {
+                setVal("res-txt", JSON.stringify(res));
+            });
+        }
+
+        function clrObj()
+        {
+            obj = {};
+            redrawTable();
+            setVal("res-txt", "");
+        }
+        function addToObj(){
+            if(getVal("attrName") == "")
+                return alert("Attribute Name Missing");
+            
+            obj[getVal("attrName")] = getVal("attrValue");
+            setVal("attrName", "");
+            setVal("attrValue", "");
+
+            redrawTable();
+        }
+        function removeAttr(key)
+        {
+            delete obj[key];
+            redrawTable();
+        }
+        function redrawTable()
+        {
+            var tbody = document.getElementById("json-table").getElementsByTagName("tbody")[0];
+            var entries = document.getElementsByClassName("entry");
+            for(var x = 0; x < entries.length; x ++)
+                tbody.removeChild(entries[x--]);
+
+            var keys = Object.keys(obj);
+            for(var x = 0; x < keys.length; x++)
+            {
+                var tableEntry = document.createElement("tr");
+                tableEntry.className ="entry";
+
+                var tableData = document.createElement("td");
+                tableData.appendChild(document.createTextNode(keys[x]));
+                tableData.className ="text-center";
+                tableEntry.appendChild(tableData);
+
+                var tableData = document.createElement("td");
+                tableData.appendChild(document.createTextNode(obj[keys[x]]));
+                tableData.className ="text-center";
+                tableEntry.appendChild(tableData);
+
+                var removeButton = document.createElement("BUTTON");
+                removeButton.appendChild(document.createTextNode("x"));
+                removeButton.setAttribute("onClick", "removeAttr('" + keys[x] + "')")
+                removeButton.className = "btn btn-warning center-block";
+                tableEntry.appendChild(removeButton);
+                tbody.appendChild(tableEntry);
+            }
+
+            setVal("json-txt", JSON.stringify(obj));
+        }
+
+    </script>
+</body>
+
+</html>

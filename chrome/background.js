@@ -7,6 +7,18 @@ chrome.browserAction.onClicked.addListener(function(tab) {
   });
 });
 
+function test()
+{
+    chrome.storage.sync.set({ "dressrToken": "1221i391jio12kmld" }, function(){
+        console.log("Saved successfully");
+    });
+
+    chrome.storage.sync.get("dressrToken", function(items){
+        console.log(items);
+    });
+
+}
+
 function postRequest(url, data, callback){
 	var request = new XMLHttpRequest();
 	request.open("POST", url, true);

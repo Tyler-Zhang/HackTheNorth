@@ -37,7 +37,7 @@ app.all('*', function(req, res, next) {
 });
 
 app.use(busboy());
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, "public")));
 
 addPostListener("createacc", (res, data) => {
     if(!checkData(res, data, ["username", "password"]))
@@ -83,7 +83,7 @@ app.post('/update', (req, res) => {
     req.pipe(req.busboy);
     req.busboy.on('file', function (fieldname, file, filename) {
         //Path where image will be uploaded
-        imageId = uuid.v4() + "." +filename.split(".")[1];
+        imageId = uuid.v4() + ((filename.split(".")[1] == undefined)? "" : "." +filename.split(".")[1]);
         fstream = fs.createWriteStream(__dirname + '/img/' + imageId);
         file.pipe(fstream);
         fstream.on('close', function () {});
