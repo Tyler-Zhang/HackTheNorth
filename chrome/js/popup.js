@@ -7,7 +7,7 @@ function login()
     var newaccount = $("#newaccount").prop('checked');
     postRequest("http://104.155.132.7/" + ((newaccount)? "createacc": "auth"), {username: username, password:password}, (obj) => {
         if(obj.type == "ERROR")
-            alert(obj.data);
+            alert(obj.body.message);
         else{
             console.log(obj);
             var port = chrome.extension.connect({name: "Sample Communication"});
