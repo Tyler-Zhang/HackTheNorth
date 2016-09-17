@@ -1,0 +1,5 @@
+node_modules
+jsonAuth.json
+**/*.log
+.idea
+/server/data
