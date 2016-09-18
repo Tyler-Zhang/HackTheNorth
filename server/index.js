@@ -7,6 +7,7 @@ var mongo   = require("mongodb")
 var uuid    = require("uuid");
 var busboy  = require('connect-busboy');
 var fs      = require("fs");
+var phantom = require("phantom");
 var log     = require("bunyan")
                 .createLogger({
                     name: "Dressr",
@@ -18,7 +19,7 @@ var log     = require("bunyan")
 
 var usersdb;
 
-mongo.connect("mongodb://localhost:27017/Dressr", (err, d) => {
+mongo.connect("mongodb://localhost:27017/Dessr", (err, d) => {
     if(err)
     {
         log.fatal(err);
@@ -142,6 +143,55 @@ addPostListener("getdata", (res, data) => {
           e => {resp(res, ERR, e.message)});
 });
 
+addPostListener("analyze", (res, data) => {
+    if(!checkData(res, data, ["auth", "url"]))
+        return;
+    console.log(data);
+    usersdb.findOne({auth: data.auth}, {_id: 0,clothing:1})
+    .then(d => {
+        console.log(d);
+        if(d == null)
+            throw new Error("Account not found");
+        return d.clothing;
+    })
+    .then(d => {
+        return phantom.create().then(ph => {
+            return ph.createPage().then(cp => {
+                return {content:d, page:cp}
+            });
+        })
+    })
+    .then(d => {
+        return d.page.open(data.url).then(cp => {
+            return {content: d.content, page: d.page}
+        });
+    })
+    .then(d => {
+        return d.page.property('plainText').then(cp => {
+            return {content: d.content, page: cp}
+        });
+    })
+    .then(d => {
+        total = 0;
+        for (var x = 0; x < d.content.length; x++) {
+            var score = 0;
+            for (var y = 0; y < d.content[0].tags.length; y++) {
+                if(d.page.indexOf(d.content[x].tags[y]) >= 0)
+                    score++;
+            }
+            total += score >=2;
+        if(total > 0)
+            resp(res, SUC, {own: true, total});
+        else
+            resp(res, SUC, {own: false});
+        }
+    })
+    .catch(e =>{
+        resp(res, ERR, e.message);
+    })
+
+});
+
 app.get("/getdata/:auth", (req,res) => {
     usersdb.findOne({auth: req.params.auth}, {_id: 0, pass: 0, auth: 0})
     .then(d => {
@@ -170,7 +220,6 @@ app.get("/img/:auth/:imageid", (req, res) => {
         res.sendFile(path.join(__dirname, 'img', imageid));
     })
 });
-
 
 
 function addPostListener(URL, callBack)
