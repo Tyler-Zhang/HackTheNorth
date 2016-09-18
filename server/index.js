@@ -95,9 +95,11 @@ app.post('/update', (req, res) => {
         });
 
         req.busboy.on("finish", function(){
-            if(!checkData(res, obj, ["tags", "auth"]))
+            if(!checkData(res, obj, ["auth"]))
                 return;
-            obj.tags = obj.tags.trim().split(" ");
+            if(obj.tags)
+                obj.tags = obj.tags.trim().split(" ");
+            else obj.tags = [];
             usersdb.findOne({auth: obj.auth})
             .then(d => {
                 if(d == null)
@@ -134,8 +136,12 @@ addPostListener("getdata", (res, data) => {
 
 app.get("/getdata/:auth", (req,res) => {
     usersdb.findOne({auth: req.params.auth}, {_id: 0, pass: 0, auth: 0})
-    .then(d => {resp(res, SUC, d)},
-          e => {resp(res, ERR, e.message)});
+    .then(d => {
+        if(d != null)
+            return resp(res, SUC, d);
+        throw new Error("Account not found");
+    })
+    .catch( e => {resp(res, ERR, e.message)});
 })
 
 app.get("/img/:auth/:imageid", (req, res) => {
