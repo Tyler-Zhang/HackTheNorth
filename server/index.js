@@ -79,7 +79,7 @@ addPostListener("auth", (res, data) => {
 });
 
 app.post('/update', (req, res) => {
-    log("Request Recieved");
+    log.info("Request Recieved");
     var fstream, imageId;
     req.pipe(req.busboy);
     req.busboy.on('file', function (fieldname, file, filename) {
