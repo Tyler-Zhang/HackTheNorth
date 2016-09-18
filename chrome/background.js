@@ -1,16 +1,18 @@
 // Check if there's a pre-existing auth token
 // chrome.storage.sync.set({dressrToken: null}, () => {});
-var token, userData;
+var token, userData, lastRefresh, refreshRate = 60*1000;
 
 chrome.storage.sync.get("dressrToken", value => {
     console.log(value.dressrToken);
     if (value.dressrToken != null) {
         chrome.browserAction.setPopup({ popup: "popup.html" });
         token = value.dressrToken;
+        chrome.storage.sync.set({dressrToken: token});
     }
 });
 
 chrome.extension.onConnect.addListener(function (port) {
+    if(port.name == "sign-in")
     port.onMessage.addListener(function (msg) {
         console.log(msg);
         if (msg.auth) {
@@ -21,6 +23,26 @@ chrome.extension.onConnect.addListener(function (port) {
             port.postMessage("popup.html");
         }
     });
+
+    else if(port.name =="pop-up")
+    {
+        port.onMessage.addListener(function (msg) {
+            if(msg.command == "data")
+            {
+                if(!userData || new Date().getTime() - lastRefresh.getTime() > refreshRate)
+                {
+                    postRequest("http://104.155.132.7/getdata", {auth: token}, (data) => {
+                        if(data.type == "ERROR")
+                            return console.log(data.body);
+                        userData = data.body;
+                        userData.auth = token;
+                        port.postMessage(userData);
+                    })
+                }
+            }
+        });
+
+    }
 });
 
 chrome.runtime.onMessage.addListener(
@@ -68,5 +90,5 @@ var websitesList = [
     "abercrombie.ca",
     "www.ae.com",
     "victoriassecret.com",
-    
+
 ]
