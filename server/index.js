@@ -19,7 +19,7 @@ var log     = require("bunyan")
 
 var usersdb;
 
-mongo.connect("mongodb://localhost:27017/Dessr", (err, d) => {
+mongo.connect("mongodb://localhost:27017/Dressr", (err, d) => {
     if(err)
     {
         log.fatal(err);
@@ -180,7 +180,7 @@ addPostListener("analyze", (res, data) => {
                     score++;
             }
             total += score >=2;
-            console.log("Reached final stage");
+            
         if(total > 0)
             resp(res, SUC, {own: true, total});
         else

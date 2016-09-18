@@ -10,7 +10,7 @@ function login()
             alert(obj.body.message);
         else{
             console.log(obj);
-            var port = chrome.extension.connect({name: "Sample Communication"});
+            var port = chrome.extension.connect({name: "sign-in"});
             port.postMessage(obj.body);
             port.onMessage.addListener(function(msg) {
                 console.log(msg);
