@@ -1,18 +1,24 @@
 var firstLoad = true;
-var auth, clothing;
+var auth, clothes;
 
 var port = chrome.extension.connect({name: "pop-up"});
 port.postMessage({command: "data"});
 port.onMessage.addListener(function(msg) {
     auth = msg.auth;
-    clothing = msg.clothing;
+    clothes = msg.clothing;
     processData();
 });
 
-function processData()
+function processData(overloadedSet)
 {
+    var clothing = overloadedSet || clothes;
+    console.log(clothes);
+    console.log(overloadedSet);
+    console.log(clothing);
+
     var wordCounter = [];
     var wordCounterAmt = [];
+
     var url = "http://104.155.132.7/img/" + auth + "/";
     var container = document.getElementById("isotope-gallery-container");
     container.innerHTML = "";
@@ -24,7 +30,8 @@ function processData()
 
         for(var y = 0; y < clothing[x].tags.length; y++)
         {
-            var curr = clothing[x].tags[y];
+            var curr = clothing[x].tags[y].toUpperCase();
+            console.log(curr);
             var idx = wordCounter.indexOf(curr);
             if( idx >= 0)
             {
@@ -38,6 +45,7 @@ function processData()
     }    
     if(firstLoad)
         mostPopFilter(wordCounterAmt, wordCounter);
+    firstLoad = false;
 }
 function mostPopFilter(wordCounterAmt, wordCounter)
 {
@@ -52,11 +60,11 @@ function mostPopFilter(wordCounterAmt, wordCounter)
                 flag = true;
                 var temp = wordCounterAmt[x];
                 wordCounterAmt[x] = wordCounterAmt[x+1];
-                wordCounterAmt[x+1] = wordCounterAmt[x];
+                wordCounterAmt[x+1] = temp;
 
                 var temp = wordCounter[x];
                 wordCounter[x] = wordCounter[x+1];
-                wordCounter[x+1] = wordCounter[x];                    
+                wordCounter[x+1] = temp;                    
             }
         }
     }
@@ -64,22 +72,31 @@ function mostPopFilter(wordCounterAmt, wordCounter)
     
     for(var x = 0; x < Math.min(6, wordCounter.length); x++)
     {
-        var format = '<li><a class = "btn btn-primary" role="button" href="#" data-filter=".' + wordCounter[x] + '"onClick="filter("' + wordCounter[x] + '")">' + wordCounter[x] + '</a></li>';
+        var format = '<li><a id="filter-' +  wordCounter[x] + '" data-filter="' + wordCounter[x] + '" class = "btn btn-primary filterClass" role="button" href="#" data-filter=".' + wordCounter[x] + '")">' + wordCounter[x] + '</a></li>';
         container.innerHTML += format;
+        $(".filterClass").click(function(evt){
+            filter($(this).data("filter"));
+        });
+        
     }
 }
 
 function filter(f)
 {
-    if(f.toUpperCase() == "ALL")
-        return processData(clothing);
+    if(f.toUpperCase() == "ALL") {
+        processData();
+        return;
+    }
 
     var filteredData = [];
 
-    for(var x = 0; x < clothing.length; x ++)
+    for(var x = 0; x < clothes.length; x ++)
     {
-        if(clothing[x].tags.indexOf(f) >= 0)
-            filteredData.push(clothing[x]);
+        if(clothes[x].tags.map(function(a){
+            return a.toUpperCase()
+        }).indexOf(f) >= 0) {
+            filteredData.push(clothes[x]);
+        }
     }
 
     processData(filteredData);

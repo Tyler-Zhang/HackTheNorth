@@ -51,7 +51,7 @@ addPostListener("createacc", (res, data) => {
     })
     .then(d => {
         var auth = uuid.v4();
-        return usersdb.insertOne({usr: data.username, pass:data.password, auth: auth, clothing: []})
+        return usersdb.insertOne({usr: data.username, pass:data.password, auth: auth, clothing: [], bookmarks: []})
                .then(() => auth);
     })
     .then(d => {
@@ -136,6 +136,19 @@ app.post('/update', (req, res) => {
         resp(res, ERR, "An error occured.");
     }
 });
+
+addPostListener("bookmark", (res, data) => {
+    if(!checkData(res, data, ["auth", "url"]))
+        return;
+    usersdb.findOne({auth: data.auth})
+    .then(d => {
+        if(d == null)
+            throw new Error("Account not found!")
+        return usersdb.updateOne({auth: data.auth}, {$push : {bookmarks: {url: data.url, title: data.title, price: data.price}}})
+    })
+    .then( d => {resp(res, SUC, "Bookmark Saved")},
+           e => {resp(res, ERR, e.message)});
+})
 
 addPostListener("getdata", (res, data) => {
     usersdb.findOne({auth: data.auth}, {_id: 0, pass: 0, auth: 0})
