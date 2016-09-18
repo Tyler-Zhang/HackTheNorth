@@ -180,6 +180,7 @@ addPostListener("analyze", (res, data) => {
                     score++;
             }
             total += score >=2;
+            console.log("Reached final stage");
         if(total > 0)
             resp(res, SUC, {own: true, total});
         else
