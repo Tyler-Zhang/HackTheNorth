@@ -9,7 +9,7 @@ var busboy  = require('connect-busboy');
 var fs      = require("fs");
 var log     = require("bunyan")
                 .createLogger({
-                    name: "Dessr",
+                    name: "Dressr",
                     streams: [
                     {level: "debug", stream: process.stdout},
                     {level: "warn", path: "logs.log"}
@@ -18,7 +18,7 @@ var log     = require("bunyan")
 
 var usersdb;
 
-mongo.connect("mongodb://localhost:27017/Dessr", (err, d) => {
+mongo.connect("mongodb://localhost:27017/Dressr", (err, d) => {
     if(err)
     {
         log.fatal(err);
