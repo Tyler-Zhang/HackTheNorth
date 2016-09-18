@@ -16,21 +16,53 @@
 
     </head>
     <body class="container-fluid" style="background-color:white; min-width:300px;">
-        <div class="row">
-            <h1 style= "font-family: Montserrat" class = "col-xs-8 col-xs-offset-4"> DRESSR </h1>
-            
+        <div class="row" style="background-color:black; color: white; padding-bottom:10px;">
+            <h1 style= "font-family: Montserrat" class = "col-xs-8 col-xs-offset-2"> DRESSR </h1>
         </div>
+        <br>
 
-        <div class="row">
-            <div class="form-horizontal col-md-6 col-md-offset-0">
-                <label for="username"> Username </label>
-                <input type="text" class="form-control" id="username" placeholder="Username"/>
-                <label for="password"> Password </label>
-                <input type="password" class="form-control" id="password" placeholder="Password" style="margin-bottom:30px;"/>
-                <label for="pnewaccount"> New Account </label>
-                <input type="checkbox" id="newaccount">
+        <div class="container">
+            <div class = "row">
+                <label for="username" style="text-align: center; font-size: 18px; font-family: Montserrat" class= "col-xs-offset-0"> ------- Username -------</label>
+            </div>
+            
+            <div class = "row">
+                <input type="text" style="width: 230px; text-align: center; font-family: Montserrat" class="col-xs-offset-1 form-control" id="username" placeholder="Enter your username"/> 
+            </div>
+                <br>
+            <div class= "row">
+                <label for="password" style="text-align: center; font-size: 18px; font-family: Montserrat" class= "col-xs-offset-0"> ------- Password ------- </label>
                 
-                <button class="btn-success center-block" style="margin-top:50px; margin-bottom:50px;" id="submitBtn"> Login </button>
+            </div>
+
+            <div class = "row">
+                <input type="password" style="width: 230px; text-align: center; font-family: Montserrat" class="col-xs-offset-1 form-control" id="password" placeholder="Enter your password"/> 
+            </div> 
+                <br>
+
+            <div class = "row">
+                
+                
+                
+
+                <label class = "col-xs-9 col-xs-offset-1" for="pnewaccount" style= "margin-bottom: 0px; padding-bottom: 0px; color: #545454; font-family: Montserrat Light"> Is this your first time on Dressr? </label> </div>
+
+                <div class = "row" id="hello">
+                    <div class = "col-xs-10  centered">
+
+                    <input class = "col-xs-offset-2" style="text-align:center; vertical-align:middle; float: center " type="checkbox" id="newaccount"> 
+                    <span class = "col-xs-offset-6" id="chkbox" style= "font: #696969; font-family: Montserrat Light"> Yes! </span> 
+
+                    </div>
+                    </div>
+
+
+
+
+
+
+                <button class="btn-success center-block" style="margin-top:0px; background-color: #228B22; margin-bottom:24px; font-family: Montserrat;" id="submitBtn"> Login </button>
+                
             </div>
 
         </div>

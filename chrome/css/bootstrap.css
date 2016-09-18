@@ -12,8 +12,33 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
 }
 
+@import url(http://allfont.net/allfont.css?fonts=montserrat-light);
+
  @import url(http://fonts.googleapis.com/css?family=Montserrat:400,700);
 
+#hello {
+  display: inline;
+  padding-top:0px;
+}
+#chkbox {
+   padding-left: 3px;
+   
+ }
+
+label {
+    float: right;
+    margin: 5px 0px;
+}
+
+input {
+    float: left;
+    margin: 5px 0px;
+    width: 200px;
+}
+
+.clear {
+    clear: both;
+}
 
 html {
   font-family: 'Montserrat-Regular', sans-serif;
@@ -184,6 +209,7 @@ fieldset {
   padding: .35em .625em .75em;
   margin: 0 2px;
   border: 1px solid #c0c0c0;
+  width:125px;
 }
 legend {
   padding: 0;
@@ -263,6 +289,7 @@ th {
   }
   .label {
     border: 1px solid #000;
+    text-align: center;
   }
   .table {
     border-collapse: collapse !important;
@@ -1602,8 +1629,10 @@ pre code {
 .container {
   padding-right: 15px;
   padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
+  margin-right: 10px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+
 }
 @media (min-width: 768px) {
   .container {
@@ -2525,7 +2554,7 @@ legend {
 }
 label {
   display: inline-block;
-  max-width: 100%;
+  min-width: 100%;
   margin-bottom: 5px;
   font-weight: bold;
 }

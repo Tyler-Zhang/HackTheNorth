@@ -1,6 +1,6 @@
 // Check if there's a pre-existing auth token
 // chrome.storage.sync.set({dressrToken: null}, () => {});
-var token, userData, lastRefresh, refreshRate = 60*1000;
+var token, userData, lastRefresh = new Date(), refreshRate = 60*5*1000;
 
 chrome.storage.sync.get("dressrToken", value => {
     console.log(value.dressrToken);
@@ -38,6 +38,8 @@ chrome.extension.onConnect.addListener(function (port) {
                         userData.auth = token;
                         port.postMessage(userData);
                     })
+                } else {
+                    port.postMessage(userData);
                 }
             }
         });
