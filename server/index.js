@@ -79,6 +79,7 @@ addPostListener("auth", (res, data) => {
 });
 
 app.post('/update', (req, res) => {
+    log("Request Recieved");
     var fstream, imageId;
     req.pipe(req.busboy);
     req.busboy.on('file', function (fieldname, file, filename) {
@@ -96,10 +97,16 @@ app.post('/update', (req, res) => {
 
         req.busboy.on("finish", function(){
             if(!checkData(res, obj, ["auth"]))
-                return;
+                return fs.unlink(path.join(__dirname, "img", imageId), e => {
+                            if(e) 
+                                return log(err);
+                            console.log('File deleted successfully');
+                        }); 
+
             if(obj.tags)
                 obj.tags = obj.tags.trim().split(" ");
             else obj.tags = [];
+
             usersdb.findOne({auth: obj.auth})
             .then(d => {
                 if(d == null)
@@ -114,17 +121,18 @@ app.post('/update', (req, res) => {
             })
             .catch(e => {
                 resp(res, ERR, e.message);
+                log(e);
                 fs.unlink(path.join(__dirname, "img", imageId), e => {
                     if(e) 
                         return console.log(err);
-                    console.log('file deleted successfully');
+                    console.log('File deleted successfully.');
                 });  
             })
         });
     } catch(e)
     {
         log(e);
-        resp(res, ERR, "an error occured");
+        resp(res, ERR, "An error occured.");
     }
 });
 
@@ -139,7 +147,7 @@ app.get("/getdata/:auth", (req,res) => {
     .then(d => {
         if(d != null)
             return resp(res, SUC, d);
-        throw new Error("Account not found");
+        throw new Error("Account not found.");
     })
     .catch( e => {resp(res, ERR, e.message)});
 })
@@ -157,7 +165,7 @@ app.get("/img/:auth/:imageid", (req, res) => {
         if(e)
             return resp(res, ERR, e.message);
         if(r.length == 0)
-            return resp(res, ERR, "You do not have access to this image");
+            return resp(res, ERR, "You do not have access to this image.");
 
         res.sendFile(path.join(__dirname, 'img', imageid));
     })
@@ -211,5 +219,5 @@ function resp(res, type, body)
 
 // Create web server
 http.createServer(app).listen(80, function(){
-    log.info("The server has been opened on port 80");
+    log.info("The server has been opened on port 80.");
 });
