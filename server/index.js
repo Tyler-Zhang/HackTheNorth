@@ -162,7 +162,6 @@ addPostListener("analyze", (res, data) => {
     console.log(data);
     usersdb.findOne({auth: data.auth}, {_id: 0,clothing:1})
     .then(d => {
-        console.log(d);
         if(d == null)
             throw new Error("Account not found");
         return d.clothing;
@@ -181,7 +180,7 @@ addPostListener("analyze", (res, data) => {
     })
     .then(d => {
         return d.page.property('plainText').then(cp => {
-            return {content: d.content, page: cp}
+            return {content: d.content, page: cp.toUpperCase()}
         });
     })
     .then(d => {
@@ -189,7 +188,7 @@ addPostListener("analyze", (res, data) => {
         for (var x = 0; x < d.content.length; x++) {
             var score = 0;
             for (var y = 0; y < d.content[0].tags.length; y++) {
-                if(d.page.indexOf(d.content[x].tags[y]) >= 0)
+                if(d.page.indexOf(d.content[x].tags[y].toUpperCase()) >= 0)
                     score++;
             }
             total += score >=2;
