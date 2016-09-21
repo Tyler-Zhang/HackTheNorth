@@ -5,7 +5,7 @@ function login()
     var username = getVal("username");
     var password = getVal("password");
     var newaccount = $("#newaccount").prop('checked');
-    postRequest("http://104.155.132.7/" + ((newaccount)? "createacc": "auth"), {username: username, password:password}, (obj) => {
+    postRequest("http://localhost/" + ((newaccount)? "createacc": "auth"), {username: username, password:password}, (obj) => {
         if(obj.type == "ERROR")
             alert(obj.body.message);
         else{

@@ -41,6 +41,7 @@ app.use(busboy());
 app.use(express.static(path.join(__dirname, "Public")));
 
 addPostListener("createacc", (res, data) => {
+    console.log("Create account recieved");
     if(!checkData(res, data, ["username", "password"]))
         return;
     
@@ -185,19 +186,19 @@ addPostListener("analyze", (res, data) => {
     })
     .then(d => {
         total = 0;
+        console.log(d.page);
         for (var x = 0; x < d.content.length; x++) {
             var score = 0;
-            for (var y = 0; y < d.content[0].tags.length; y++) {
+            for (var y = 0; y < d.content[x].tags.length; y++) {
                 if(d.page.indexOf(d.content[x].tags[y].toUpperCase()) >= 0)
                     score++;
             }
             total += score >=2;
-            
+        }
         if(total > 0)
             resp(res, SUC, {own: true, total});
         else
             resp(res, SUC, {own: false});
-        }
     })
     .catch(e =>{
         resp(res, ERR, e.message);

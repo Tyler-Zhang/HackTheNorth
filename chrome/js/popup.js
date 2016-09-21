@@ -19,7 +19,7 @@ function processData(overloadedSet)
     var wordCounter = [];
     var wordCounterAmt = [];
 
-    var url = "http://104.155.132.7/img/" + auth + "/";
+    var url = "http://localhost/img/" + auth + "/";
     var container = document.getElementById("isotope-gallery-container");
     container.innerHTML = "";
     for(var x = 0; x < clothing.length; x ++)

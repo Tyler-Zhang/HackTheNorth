@@ -31,7 +31,7 @@ chrome.extension.onConnect.addListener(function (port) {
             {
                 if(!userData || new Date().getTime() - lastRefresh.getTime() > refreshRate)
                 {
-                    postRequest("http://104.155.132.7/getdata", {auth: token}, (data) => {
+                    postRequest("http://localhost/getdata", {auth: token}, (data) => {
                         if(data.type == "ERROR")
                             return console.log(data.body);
                         userData = data.body;
@@ -55,7 +55,7 @@ chrome.runtime.onMessage.addListener(
         if(!token)
             console.log("System can't run before token is set");
         sendResponse({});
-        postRequest("http://104.155.132.7/analyze", {auth: token, url: request.url}, (obj) => {
+        postRequest("http://localhost/analyze", {auth: token, url: request.url}, (obj) => {
             if(obj.type == "ERROR")
                 return console.log("ERROR "+obj.body);
             console.log(obj);
